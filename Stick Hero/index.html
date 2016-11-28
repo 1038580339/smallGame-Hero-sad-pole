@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{
+            margin: 0;
+        }
+        /*canvas{*/
+            /*!*background: ;*!*/
+            /*width: 800px;*/
+            /*height: 1000px;*/
+            /*margin: 0 auto;*/
+            /*display: block;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="300" height="500"></canvas>
+<script>
+    var play=0;
+    var canvas=document.getElementById("canvas");
+    var cxt=canvas.getContext("2d");
+//    定义一个柱子
+    var j1x=0,j1y=0,j1h=0,j1w=60;
+    var j2x=0,j2y=0,j2h=0,j2w=0;
+    var j3x=0,j3y=0,j3h=0,j3w=0;
+
+    var gunzic=0,gunzix=60,gunziy=330;
+//    小方块
+    var playx=40,playy=330,fenshu=0;
+
+    window.addEventListener("keydown",dokeydown,false);
+    window.addEventListener("keyup",dokeyup,false);
+//    window.addEventListener("keyup",moveplay,false);
+    start();
+
+    function start() {
+        play=0;
+        j1x=0,j1y=0,j1h=0,j1w=60;
+        j2x=0,j2y=0,j2h=0,j2w=0;
+        j3x=0,j3y=0,j3h=0,j3w=0;
+        gunzic=0,gunzix=60,gunziy=330;
+        playx=40,playy=330,fenshu=0;
+
+
+        cxt.fillStyle="#ABCDEF";
+        cxt.fillRect(0,0,300,500);
+        cxt.fillStyle="#000000";
+        cxt.fillRect(j1x,350,j1w,150);
+//        第二个，随机生成
+        j2x=Math.floor(Math.random()*150+20)+j1x+j1w;
+        j2w=Math.floor(Math.random()*50+20);
+        cxt.fillRect(j2x,350,j2w,150);
+//        第三块
+        j3x=Math.floor(Math.random()*150+20)+j2x+j2w;
+        j3w=Math.floor(Math.random()*50+20);
+        cxt.fillRect(j3x,350,j3w,150);
+//        小红块
+        cxt.fillStyle="red";
+        cxt.fillRect(playx,playy,20,20);
+
+        huafenshu();
+    }
+//    棍子动
+    function dokeydown(e) {
+
+                var keycod=e.keyCode||e.which;//兼容火狐
+        if(keycod===32){
+//            棍子的垂直坐标
+            if(play==0){
+            gunziy=gunziy-5;
+//            棍子的长度（不断增加）
+            gunzic=350-gunziy;
+            cxt.strokeStyle="#9933CC";
+            cxt.lineWidth=4;
+            cxt.moveTo(playx+20,playy+20);
+            cxt.lineTo(gunzix,gunziy);
+            cxt.stroke();
+        }
+        }else if(keycod===13){
+            start();
+        }
+    }
+
+    function dokeyup(e) {
+        if(play==0){
+        var keycod=e.keyCode||e.which;
+        if(keycod===32){
+            gunziy=350;
+//            cxt.beginPath();
+//            cxt.strokeStyle="#000000";
+//            cxt.lineWidth=4;
+//            cxt.moveTo(playx+20,playy+20);
+//            cxt.lineTo(playx+20+gunzic,gunziy);
+//            cxt.stroke();
+//            cxt.beginPath();
+//            cxt.strokeStyle="#ABCDEF";
+//            cxt.lineWidth=4;
+//            cxt.moveTo(playx+20,playy+20);
+//            cxt.lineTo(playx+20,350-gunzic);
+//            cxt.stroke();
+           var i=0.5*Math.PI;
+          var peri=i/50;
+            var id=setInterval(function () {
+                i-=peri;
+                cxt.beginPath();
+            cxt.strokeStyle="#000000";
+            cxt.lineWidth=4;
+            cxt.moveTo(playx+20,playy+20);
+            cxt.lineTo(playx+20+gunzic*Math.cos(i),350-gunzic+gunzic*Math.sin(0.5*Math.PI-i));
+            cxt.stroke();
+            cxt.beginPath();
+            cxt.strokeStyle="#ABCDEF";
+            cxt.lineWidth=4;
+            cxt.moveTo(playx+20,playy+20);
+            cxt.lineTo(playx+20+gunzic*Math.cos(i+peri),350-gunzic+gunzic*Math.sin(0.5*Math.PI-(i+peri)));
+            cxt.stroke();
+                if(i<=peri*2){
+                    clearInterval(id);
+                   cxt.strokeStyle="#000000";
+            cxt.lineWidth=4;
+           cxt.moveTo(playx+20,playy+20);
+           cxt.lineTo(playx+20+gunzic,gunziy);
+                    cxt.stroke();
+                }
+            },20);
+
+            setTimeout(moveplay,1000);
+        }
+    }
+    }
+
+    function moveplay() {
+        cxt.beginPath();
+        cxt.strokeStyle="#ABCDEF";
+        cxt.fillStyle="#ABCDEF";
+        cxt.fillRect(playx,playy,20,20);
+        cxt.stroke();
+        cxt.beginPath();
+        cxt.strokeStyle="red";
+        cxt.fillStyle="red";
+        playx=playx+5;
+        cxt.fillRect(playx,playy,20,20);
+        cxt.stroke();
+        if(playx<=gunzic+j1w-20){
+            setTimeout(moveplay,30);
+        }else {
+            if(j1w+gunzic<(j2x+j2w)&&j1w+gunzic>j2x){
+                cxt.beginPath();
+                cxt.strokeStyle="#ABCDEF";
+                cxt.fillStyle="#ABCDEF";
+                cxt.fillRect(playx,playy,20,20);
+                cxt.stroke();
+                cxt.beginPath();
+                cxt.strokeStyle="red";
+                cxt.fillStyle="red";
+                playx=j2x+j2w-20;
+                cxt.fillRect(playx,playy,20,20);
+                cxt.stroke();
+                fenshu++;
+//                移动整个画布
+                moveall();
+            }else {
+
+                      gameover();
+            }
+        }
+
+    }
+    function moveall() {
+        cxt.fillStyle="#ABCDEF";
+        cxt.fillRect(0,0,300,500);
+        cxt.fillStyle="#000000";
+        j1x--;
+        j2x--;
+        j3x--;
+        playx--;
+        cxt.fillRect(j1x,350,j1w,150);
+        cxt.fillRect(j2x,350,j2w,150);
+        cxt.fillRect(j3x,350,j3w,150);
+        cxt.fillStyle="red";
+        cxt.fillRect(playx,playy,20,20);
+        huafenshu();
+        if(j2x>=0){
+            setTimeout(moveall,3);
+        }else {
+
+            change();
+        }
+    }
+
+    function change() {
+        j1x=j2x;
+        j1w=j2w;
+        j2x=j3x;
+        j2w=j3w;
+//                没有j3了，生成一个j3
+        j3x=Math.floor(Math.random()*150+20)+j2x+j2w;
+        j3w=Math.floor(Math.random()*50+20);
+//                替换棍子
+        gunzix=j1w;
+    }
+    //      分数
+    function huafenshu() {
+        cxt.fillStyle="#fff";
+        cxt.font="60px 宋体";
+        cxt.fillText(fenshu,140,60);
+    }
+    function gameover() {
+        cxt.beginPath();
+        cxt.fillStyle="#ABCDEF";
+        cxt.fillRect(0,0,300,500);
+        cxt.fillStyle="white";
+        cxt.font="60px 宋体";
+        cxt.fillText("Game over",10,200);
+        cxt.font="30px 宋体";
+        cxt.fillStyle="white";
+        cxt.fillText("score:"+fenshu,90,300);
+        cxt.font="30px 宋体";
+        cxt.fillStyle="white";
+        cxt.fillText("按ENTER键继续",50,400);
+        play=1;
+    }
+</script>
+</body>
+</html>
